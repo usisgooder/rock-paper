@@ -12,7 +12,7 @@ class Node {
             dist += 1;
         }
         if (dist === MAX_DIST) {
-            console.error("Can't find winner");
+            throw "Can't find winner";
         }
         return dist;
     }
@@ -32,23 +32,41 @@ function computerPlay() {
 }
 
 function playRound(playerSelection, computerSelection) {
-    let playerScore = mapper[playerSelection].distToNode(computerSelection),
-    computerScore = mapper[computerSelection].distToNode(playerSelection);
-    if (playerScore < computerScore) {
+    console.log(playerSelection, computerSelection)
+    playerSelection = playerSelection.toLowerCase();
+    computerSelection = computerSelection.toLowerCase();
+    let playerDist = mapper[playerSelection].distToNode(computerSelection),
+        computerDist = mapper[computerSelection].distToNode(playerSelection);
+    if (playerDist < computerDist) {
+        playerScore++;
         return `Player wins! ${playerSelection} wins ${computerSelection}`;
     }
-    else if (playerScore === computerScore) {
+    else if (playerDist === computerDist) {
         return `Draw! Both picked (${playerSelection}, ${computerSelection})`;
     } else {
+        computerScore++;
         return `Computer wins! ${computerSelection} wins ${playerSelection}`;
     }
 }
 
-function game() {
-    for (var i = 0; i < 5; i++) {
-        var playerSelection = prompt();
-        console.log(playRound(playerSelection, 'paper'));
+function game(playerSelection) {
+    const computerSelection = computerPlay();
+    resultDisplay.innerHTML = playRound(playerSelection, computerSelection);;
+    playerScoreDisplay.innerHTML = playerScore.toString();
+    computerScoreDisplay.innerHTML = computerScore.toString();
+    selectionDisplay.innerHTML = `<li>Computer selected: ${computerSelection}</li> <li>Player selected: ${playerSelection}</li>`;
+    if (Math.max(playerScore, computerScore) === maxScore) {
+        let winner = playerScore === maxScore ? "Player" : "Computer";
+        alert(`${winner} is the winner!`);
+        document.querySelectorAll('button').forEach(elem => elem.onclick = null);
     }
 }
 
-game();
+var playerScore = 0, computerScore = 0;
+const maxScore = 5;
+const playerScoreDisplay = document.querySelector('.player-score');
+const computerScoreDisplay = document.querySelector('.computer-score');
+const resultDisplay = document.querySelector('.result');
+const selectionDisplay = document.querySelector('.selection');
+document.querySelectorAll('button').forEach(elem => elem.onclick = () => {game(elem.textContent);});
+
